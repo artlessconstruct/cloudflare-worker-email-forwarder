@@ -1,0 +1,7 @@
+.dev.vars
+.env
+.envrc
+.vscode
+.wrangler
+node_modules
+wrangler.toml
