@@ -20,7 +20,7 @@
     "devDependencies": {
         "@cloudflare/vitest-pool-workers": "^0.7.1",
         "vitest": "^3.0.9",
-        "wrangler": "^4.15.2"
+        "wrangler": "^4.16.0"
     },
     "dependencies": {
         "regexp.escape": "^2.0.1"
