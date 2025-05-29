@@ -35,13 +35,12 @@ This Email Worker provides a reliable solution to these shortcomings in Cloudfla
 
 ### Limitations
 
-1. **Cloudflare only forwards to verified destination addresses!**
-
+1. **Cloudflare will only forward to a destination address which has been verified!**
 2. Using Email Workers introduces limits that may not otherwise exist with [Cloudflare Email Routing's routing rules](https://developers.cloudflare.com/email-routing/setup/email-routing-addresses/).
-	- For comparison Cloudflare Email Routing has [limits on the number of routing rules and destination addresses](https://developers.cloudflare.com/email-routing/limits/#rules-and-addresses). These are not tiered, and although a form is offered to request a limit increase, the criteria under which this would be granted is not clear. At the time of writing the standard limits were:
+	- For comparison Cloudflare Email Routing has [limits on the number of routing rules and destination addresses](https://developers.cloudflare.com/email-routing/limits/#rules-and-addresses). These are not tiered, and although a form is offered to request a limit increase, the criteria under which this would be granted is not clear. At the time of writing these limits were:
 		- Rules: 200
 		- Destination addresses: 200
-	- A KV namespace used by an Email Worker is subject to [these KV namespace limits)](https://developers.cloudflare.com/kv/platform/limits/), which on the free tier at the time of writing included:
+	- Any KV namespace used by an Email Worker is subject to [these KV namespace limits)](https://developers.cloudflare.com/kv/platform/limits/), which on the free tier at the time of writing included:
 		- Reads: 100,000/day
 		- Storage/account: 1 GB
 		- Storage/namespace: 1 GB
@@ -62,16 +61,12 @@ Considerations:
 - If you have multiple email domains then these will each require their own Email Worker unless each domain can share the same configuration, as none of the Email Worker configuration is domain specific.
 
 Procedure:
-1. Create the Email Workers you require by following [Cloudflare instructions to enable Email Workers](https://developers.cloudflare.com/email-routing/email-workers/enable-email-workers/).
+1. Create the Email Workers you require by following [Cloudflare's instructions to enable Email Workers](https://developers.cloudflare.com/email-routing/email-workers/enable-email-workers/).
 	1. Choose the option to create a `Start with Hello World!` worker, give it a suitable name and then deploy it.
-	2. Then choose to `Edit code` and replace the newly created Worker's code to be the content of this repository's `worker.js` file and again deploy it.
-2. Optionally, [create one or more KV namespaces](#create-a-kv) if user specific routing is required for any of your Email Workers.
-
-#### Create a KV namespace
-
-Procedure:
-1. Follow [Cloudflare's instructions to create a KV Namespace](https://developers.cloudflare.com/kv/get-started/#2-create-a-kv-namespace).
-2. Follow [Cloudflare's instructions to bind your KV Namespace to your Email Worker](https://developers.cloudflare.com/kv/get-started/#3-bind-your-worker-to-your-kv-namespace), choosing the `BINDING_NAME` as `MAP`.
+	2. Then choose to `Edit code` and replace the newly created Worker's code with the `worker.js` file and deploy it.
+2. Optionally, create one or more KV namespaces if user specific routing is required for any of your Email Workers:
+	1. Follow [Cloudflare's instructions to create a KV Namespace](https://developers.cloudflare.com/kv/get-started/#2-create-a-kv-namespace).
+	2. Follow [Cloudflare's instructions to bind your KV Namespace to your Email Worker](https://developers.cloudflare.com/kv/get-started/#3-bind-your-worker-to-your-kv-namespace), choosing the `BINDING_NAME` as `MAP`.
 
 ### Configure
 
@@ -198,7 +193,7 @@ Procedure:
 
 ## Contributions
 
-Contributions are welcome and not just pull requests so you are welcome to:
+Contributions as well as pull requests are welcome so feel free to:
 - [Open an issue](https://github.com/artlessconstruct/cloudflare-worker-email-forwarder/discussions/new/choose)
 - [Start a discussion](https://github.com/artlessconstruct/cloudflare-worker-email-forwarder/issues/new)
 

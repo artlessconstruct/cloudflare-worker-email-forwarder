@@ -54,9 +54,11 @@ fi
 
 # Append WRANGLER_VARS_ variables in alphabetical order
 echo "📝 Appending WRANGLER_VARS_* variables..."
-GrepWranglerVars=$(env | grep '^WRANGLER_VARS_')
+GrepWranglerVars=$(env | grep '^WRANGLER_VARS_' || true)
 if [ -n "$GrepWranglerVars" ]; then
-    echo -e "\n[vars]" >> wrangler.toml
+    if ! grep -q '^\[vars\]' wrangler.toml; then
+        echo -e "\n[vars]" >> wrangler.toml
+    fi
     echo "$GrepWranglerVars" | sort | while IFS='=' read -r name value; do
         # Extract the variable name after WRANGLER_VARS_ prefix
         var_name=${name#WRANGLER_VARS_}
