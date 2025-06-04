@@ -1,11 +1,11 @@
-# A Cloudflare Email Worker forwarding sub-addressed emails to multiple destinations with failover
+# A Cloudflare Email Worker forwarding sub-addressed emails to multiple destinations with failover to backup destinations
 
-This is a [Cloudflare Email Worker](https://developers.cloudflare.com/email-routing/email-workers/) providing configurable email forwarding which routes from email addresses using [sub-addressing](https://en.wikipedia.org/wiki/Email_address#Sub-addressing) (a.k.a. [RFC 5233 Sub-address Extension](https://datatracker.ietf.org/doc/html/rfc5233), tagged addresses, plus addresses, etc.) to a set of primary destinations simultaneously, where each such primary destination is a sequence of backup destinations attempted sequentially until one succeeds.
+This is a [Cloudflare Email Worker](https://developers.cloudflare.com/email-routing/email-workers/) providing configurable email forwarding which routes from email addresses using [sub-addressing](https://en.wikipedia.org/wiki/Email_address#Sub-addressing) (a.k.a. [RFC 5233 Sub-address Extension](https://datatracker.ietf.org/doc/html/rfc5233), tagged addresses, plus addresses, etc.) to multiple primary destinations simultaneously, where each such primary destination is a sequence of backup destinations attempted sequentially until one succeeds.
 
 ## Overview
 
 Cloudflare provides a free [Email Routing service](https://developers.cloudflare.com/email-routing/) for all domains using Cloudflare as the authoritative name server. However, at the time of writing this service does not provide:
-1. Support for sub-addressed Email_address:
+1. Support for sub-addressed email addresses:
 	- Several Cloudflare Community posts such as [this](https://community.cloudflare.com/t/support-plus-addressing-in-email-routing/346812) have requested support for sub-addressing in Cloudflare's Email Routing, but at the time of writing Cloudflare have not made any specific announcement as to when it will be supported.
 	- While [Cloudflare's Email Routing documentation](https://developers.cloudflare.com/email-routing/postmaster/#signs-such--and--are-treated-as-normal-characters-for-custom-addresses) states that `+` or `.` are treated as normal characters in a custom address testing reveals that only lower case alphanumeric, `_` and `.` characters are allowed in a custom address used in a routing rule.
 	- As a work around [Cloudflare recommends a catch-all solution](https://blog.cloudflare.com/migrating-to-cloudflare-email-routing/#gmail-address-conventions), but that only allows routing to a single destination address and exposes that address to potential spam.
@@ -36,21 +36,22 @@ This Email Worker provides a reliable solution to these shortcomings in Cloudfla
 ### Limitations
 
 1. **Cloudflare will only forward to a destination address which has been verified!**
-2. Using Email Workers introduces limits that may not otherwise exist with [Cloudflare Email Routing's routing rules](https://developers.cloudflare.com/email-routing/setup/email-routing-addresses/).
+2. This Email Worker's configuration does not support subdomain-specific routing, so if this Email Worker is configured as the catch-all for a domain, all subdomains will use the same configuration.
+3. Using Email Workers introduces limits that may not otherwise exist with [Cloudflare Email Routing's routing rules](https://developers.cloudflare.com/email-routing/setup/email-routing-addresses/).
 	- For comparison Cloudflare Email Routing has [limits on the number of routing rules and destination addresses](https://developers.cloudflare.com/email-routing/limits/#rules-and-addresses). These are not tiered, and although a form is offered to request a limit increase, the criteria under which this would be granted is not clear. At the time of writing these limits were:
 		- Rules: 200
 		- Destination addresses: 200
 	- Any KV namespace used by an Email Worker is subject to [these KV namespace limits)](https://developers.cloudflare.com/kv/platform/limits/), which on the free tier at the time of writing included:
-		- Reads: 100,000/day
+		- Reads (for all namespaces): 100,000/day
 		- Storage/account: 1 GB
 		- Storage/namespace: 1 GB
 		- Keys/namespace: unlimited
 		- Key size: 512 bytes
 		- Value size: 25 MiB
 	- A Worker itself has both [general limits](https://developers.cloudflare.com/workers/platform/limits/#account-plan-limits) and [request limits](https://developers.cloudflare.com/workers/platform/limits/#worker-limits), which on the free tier at the time of writing included:
-		- Requests: 100,000 requests/day, 1,000 requests/min
-		- Memory: 128 MB
-		- CPU time: 10 ms
+		- Requests (for all workers): 100,000 requests/day, 1,000 requests/min
+		- Memory/instance: 128 MB
+		- CPU time/request: 10 ms
 	- Given these limits an Email Worker using a KV namespace to store its routing rules should provide for a significantly greater number of rules, but it may not be suitable if the domain receives a very high volume of email traffic due to the KV namespace read and Worker request limits.
 
 ## Usage
@@ -128,7 +129,7 @@ Set the destination email address to which accepted emails sent to `{User}+{Suba
 > Default user-specific destination: Setting the `{User}` value in the `MAP`-bound KV namespace to the empty string indicates that the destination should be the global configuration destination.
 
 > [!NOTE]
-> To route to a set of primary addresses simultaneously, specify each destination in a comma-separated list. For example:
+> To route to multiple primary addresses simultaneously, specify each destination in a comma-separated list. For example:
 >
 >	 any@email1.com, any@email2.com
 

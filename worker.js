@@ -161,11 +161,12 @@ export const DEFAULTS = {
     // Returns a description of a message 
     emailImage(message) {
         return {
-            messageId: message.headers.get('Message-ID'),
-            date: message.headers.get('Date'),
             from: message.from,
             to: message.to,
             size: message.rawSize,
+            messageId: message.headers.get('Message-ID'),
+            subject: message.headers.get('subject'),
+            // allHeaders: Object.fromEntries(message.headers.entries())
         };
     },
     consoleOutput(message, level, configuration) {

@@ -1,5 +1,8 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import escape from 'regexp.escape';
+
+// Common test utilities and resources
+import { message, r } from "./test/common.js";
 
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
 import worker, { FIXED, DEFAULTS } from "./worker.js";
@@ -18,23 +21,6 @@ describe('exceptional scenarios', () => {
         USE_STORED_USER_CONFIGURATION: "true",
         REJECT_TREATMENT: 'default reject reason',
         UNRECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE: 'Unrecoverable Forward Implementation Error',
-    };
-    const message = {
-        from: 'random@internet.com',
-        forward: undefined,
-        setReject: (reason) => reason,
-        to: undefined,
-        headers: {
-            get: (headerName) => {
-                const mockHeaders = {
-                    'Message-ID': 'h9MTV7vNalV3',
-                    'Date': 'Wed, 30 Oct 2024 15:30:00 +0000'
-                };
-                return mockHeaders[headerName];
-            }
-        },
-        raw: null,
-        rawSize: null,
     };
     const setReject = vi.spyOn(message, 'setReject');
 
@@ -55,23 +41,6 @@ describe('exceptional scenarios', () => {
     // Test subject errors caught
     const recoverableForwardInterfaceErrorMessage = FIXED.RECOVERABLE_FORWARD_INTERFACE_ERROR_MESSAGE;
     const recoverableForwardInterfaceErrorRegExp = new RegExp(`^${escape(recoverableForwardInterfaceErrorMessage)}`);
-
-    // Reference test data
-    const r = {
-        user: 'user',
-        dest: 'user@email.com',
-        destDomain: '@email.com',
-        rejectDest: 'user+spam@email.com',
-        rejectReason: 'common reject reason',
-        user1: 'user1',
-        dest1: 'user1@email.com',
-        dest1a: 'user1a@email.com',
-        dest1b: 'user1b@email.com',
-        rejectDest1: 'user1+spam@email.com',
-        rejectDest1a: 'user1+spam1a@email.com',
-        rejectDest1b: 'user1+spam1b@email.com',
-        rejectReason1: 'user1 reject reason',
-    };
 
     const failHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_FAIL });
     const passHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_PASS });

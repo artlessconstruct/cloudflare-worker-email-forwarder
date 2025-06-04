@@ -1,8 +1,11 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
-import escape from 'regexp.escape';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
-import worker, { FIXED, DEFAULTS } from "./worker.js";
+import worker, {DEFAULTS } from "./worker.js";
+
+
+// Common test utilities and resources
+import { message, r } from "./test/common.js";
 
 // Multiple destination scenarios with normal conditions where:
 // - message.forward mock doesn't throw any exceptions
@@ -17,23 +20,7 @@ describe('multiple destination scenarios', () => {
         USE_STORED_USER_CONFIGURATION: "true",
         REJECT_TREATMENT: 'default reject reason'
     };
-    const message = {
-        from: 'random@internet.com',
-        forward: (to, headers) => JSON.stringify({ to, headers }),
-        setReject: (reason) => reason,
-        to: undefined,
-        headers: {
-            get: (headerName) => {
-                const mockHeaders = {
-                    'Message-ID': 'h9MTV7vNalV3',
-                    'Date': 'Wed, 30 Oct 2024 15:30:00 +0000'
-                };
-                return mockHeaders[headerName];
-            }
-        },
-        raw: null,
-        rawSize: null,
-    };
+
     const forward = vi.spyOn(message, 'forward');
     const setReject = vi.spyOn(message, 'setReject');
 
@@ -48,15 +35,6 @@ describe('multiple destination scenarios', () => {
 
     const failHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_FAIL });
     const passHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_PASS });
-
-    // Reference test data
-    const r = {
-        user1: 'user1',
-        dest1a: 'user1a@email.com',
-        dest1b: 'user1b@email.com',
-        rejectDest1a: 'user1+spam1a@email.com',
-        rejectDest1b: 'user1+spam1b@email.com',
-    };
 
     describe('destination validation', () => {
         const MAP = new Map();

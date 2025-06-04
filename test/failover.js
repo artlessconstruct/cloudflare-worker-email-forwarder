@@ -1,6 +1,9 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 import escape from 'regexp.escape';
 
+// Common test utilities and resources
+import { message, r } from "./test/common.js";
+
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
 import worker, { FIXED, DEFAULTS } from "./worker.js";
 
@@ -16,23 +19,7 @@ describe('failover scenarios', () => {
         REJECT_TREATMENT: 'default reject reason',
         UNRECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE: 'Unrecoverable Forward Implementation Error',
     };
-    const message = {
-        from: 'random@internet.com',
-        forward: undefined,
-        setReject: (reason) => reason,
-        to: undefined,
-        headers: {
-            get: (headerName) => {
-                const mockHeaders = {
-                    'Message-ID': 'h9MTV7vNalV3',
-                    'Date': 'Wed, 30 Oct 2024 15:30:00 +0000'
-                };
-                return mockHeaders[headerName];
-            }
-        },
-        raw: null,
-        rawSize: null,
-    };
+
     const setReject = vi.spyOn(message, 'setReject');
 
     beforeEach(async () => {
@@ -55,24 +42,6 @@ describe('failover scenarios', () => {
 
     const failHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_FAIL });
     const passHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_PASS });
-
-    // Reference test data
-    const r = {
-        user: 'user',
-        dest: 'user@email.com',
-        rejectDest: 'user+spam@email.com',
-        rejectReason: 'common reject reason',
-        user1: 'user1',
-        dest1: 'user1@email.com',
-        dest1a: 'user1a@email.com',
-        dest1b: 'user1b@email.com',
-        rejectDest1: 'user1+spam@email.com',
-        rejectDest1a: 'user1+spam1a@email.com',
-        rejectDest1b: 'user1+spam1b@email.com',
-        rejectReason1: 'user1 reject reason',
-        dest2a: 'user2a@email.com',
-        dest2b: 'user2b@email.com',
-    };
 
     describe('1 PD, no errors,', () => {
         const environment = {

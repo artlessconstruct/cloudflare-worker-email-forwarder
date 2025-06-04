@@ -1,8 +1,10 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
-import escape from 'regexp.escape';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Common test utilities and resources
+import { message, r } from "./test/common.js";
 
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
-import worker, { FIXED, DEFAULTS } from "./worker.js";
+import worker, { DEFAULTS } from "./worker.js";
 
 // Basic scenarios where:
 // - message.forward mock doesn't throw any exceptions
@@ -17,23 +19,7 @@ describe('basic scenarios', () => {
         USE_STORED_USER_CONFIGURATION: "true",
         REJECT_TREATMENT: 'default reject reason'
     };
-    const message = {
-        from: 'random@internet.com',
-        forward: (to, headers) => JSON.stringify({ to, headers }),
-        setReject: (reason) => reason,
-        to: undefined,
-        headers: {
-            get: (headerName) => {
-                const mockHeaders = {
-                    'Message-ID': 'h9MTV7vNalV3',
-                    'Date': 'Wed, 30 Oct 2024 15:30:00 +0000'
-                };
-                return mockHeaders[headerName];
-            }
-        },
-        raw: null,
-        rawSize: 999,
-    };
+
     const forward = vi.spyOn(message, 'forward');
     const setReject = vi.spyOn(message, 'setReject');
 
@@ -48,58 +34,6 @@ describe('basic scenarios', () => {
 
     const failHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_FAIL });
     const passHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_PASS });
-
-    // Reference test data
-    const r = {
-        user: 'user',
-        dest: 'user@email.com',
-        destSubaddressed: '+forwarded@email.com',
-        destDomain: '@email.com',
-        rejectDest: 'user+spam@email.com',
-        rejectDestSubaddressed: '+spam@email.com',
-        rejectDestDomain: '@reject.com',
-        rejectReason: 'common reject reason',
-        rejectReasonNeedingUserPrepend: ': reject reason needing user prepend',
-        rejectReasonNeedingUserPrepend2: ': reject reason needing user prepend 2',
-        user1: 'user1',
-        dest1: 'user1@email.com',
-        dest1a: 'user1a@email.com',
-        dest1b: 'user1b@email.com',
-        rejectDest1: 'user1+spam@email.com',
-        rejectDest1a: 'user1+spam1a@email.com',
-        rejectDest1b: 'user1+spam1b@email.com',
-        rejectReason1: 'reject reason 1',
-        user2: 'user2',
-        dest2: 'user2@email.com',
-        rejectDest2: 'user2+spam@email.com',
-        rejectReason1: 'reject reason 2',
-        user3: 'user3',
-        dest3: 'user3@email.com',
-        rejectDest3: 'user3+spam@email.com',
-        rejectReason3: 'reject reason 3',
-        user4: 'user4',
-        dest4: 'user4@email.com',
-        rejectDest4: 'user4+spam@email.com',
-        rejectReason4: 'reject reason 4',
-        user5: 'user5',
-        dest5: 'user5@email.com',
-        rejectDest5: 'user5+spam@email.com',
-        rejectReason5: 'reject reason 5',
-        user6: 'user6',
-        dest6: 'user6@email.com',
-        rejectDest6: 'user6+spam@email.com',
-        rejectReason6: 'reject reason 6',
-        user7: 'user7',
-        dest7: 'user7@email.com',
-        rejectDest7: 'user7+spam@email.com',
-        rejectReason7: 'reject reason 7',
-        user8: 'user8',
-        dest8: 'user8@email.com',
-        rejectDest8: 'user8+spam@email.com',
-        rejectReason8: 'reject reason 8',
-        destSpecial1: 'USER1@email.com',
-        destSpecial2: 'USER2@email.com',
-    };
 
     describe('defaults', () => {
         const environment = { ...TEST };
