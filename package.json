@@ -1,6 +1,6 @@
 {
     "name": "cloudflare-worker-email-forwarder",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "A Cloudflare Email Worker providing configurable email forwarding which routes from email addresses using sub-addressing (a.k.a. RFC 5233 sub-address extension, tagged addresses, plus addresses, etc.) to a set of primary destinations simultaneously, where each such primary destination is a sequence of backup destinations attempted sequentially until one succeeds.",
     "scripts": {
         "build": "bash ./build.sh",
@@ -18,18 +18,18 @@
         "versions:upload:keep-vars": "wrangler versions upload --keep-vars"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.8.36",
+        "@cloudflare/vitest-pool-workers": "^0.8.38",
         "vitest": "^3.1.4",
-        "wrangler": "^4.19.1"
+        "wrangler": "^4.20.0"
     },
     "dependencies": {
         "regexp.escape": "^2.0.1"
     },
     "engines": {
-        "node": "22.9.0",
-        "pnpm": "9.10.0"
+        "node": "22.16.0",
+        "pnpm": "10.11.1"
     },
     "volta": {
-        "node": "22.9.0"
+        "node": "22.16.0"
     }
 }

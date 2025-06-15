@@ -32,7 +32,8 @@ import escape from 'regexp.escape';
 export const FIXED = {
 
     // Implementation errors caught
-    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1: 'could not send email: Unknown error: transient error',
+    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1: 'could not send email:',
+    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_2: 'cannot forward email to same worker',
 
     // Interface error messages thrown
     RECOVERABLE_FORWARD_INTERFACE_ERROR_MESSAGE: 'Recoverable Forward Failure',
@@ -98,7 +99,7 @@ export const DEFAULTS = {
     // this stored address configuration will be loaded
     //
     DESTINATION: "",
-    REJECT_TREATMENT: ": Invalid recipient",
+    REJECT_TREATMENT: "Address does not exist",
     SUBADDRESSES: "*",
     USERS: "",
 
@@ -137,7 +138,7 @@ export const DEFAULTS = {
 
     // Error message configuration
     //
-    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_REGEXP: `(^${escape(FIXED.RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1)})`,
+    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_REGEXP: `^(${escape(FIXED.RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1)}|${escape(FIXED.RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_2)})`,
 
     // Cloudflare KV key-value store
     MAP: new Map(),
