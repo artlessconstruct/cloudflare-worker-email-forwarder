@@ -24,14 +24,8 @@ This Email Worker provides a reliable solution to these shortcomings in Cloudfla
 - Either direct-rejects with a reject reason or reject-forwards to a destination address (globally defined or per user).
 - Adds an email header for filtering forwarded emails in destination email client.
 - Supports KV namespaces for unlimited[*](#limitations) user-to-destination combinations (with global fallbacks).
-- Classifies errors experienced when attempting to forward an email as either:
-	- Recoverable: a.k.a. "transient", "temporary" or "soft" errors, which are often resolved after a period of time without any intervention by an administrator.
-	- Unrecoverable: a.k.a. "permanent", "persistent" or "hard" errors, which are often caused by a configuration error or a fault in the underlying system or network and which are not likely to be resolved without some intervention by an administrator.
-- Handles errors experienced during forwarding as follows:
-	- If there are one or more recoverable errors then throws an exception, which returns an error to the sender, which then will usually periodically resend the email until a retry or time limit has been reached.
-	- If there are any unrecoverable errors then these are just logged (as errors, if this is enabled) since throwing and returning an error to the sender would result in unnecessary resends as the errors will likely persist until the underlying fault has been rectified.
-	- If no primary destination was successfully forwarded to without error then the email is rejected (by reject-forwarding or direct-rejecting as configured).
-- Supports advanced configuration via environment variables.
+- Supports [advanced configuration](#advanced-configuration) via environment variables.
+- [Classifies and handles forwarding errors](#forwarding-error-classification-and-handling) as either recoverable or unrecoverable.
 
 ### Limitations
 
@@ -158,10 +152,35 @@ Set the reject treatment for an email sent to `{User}+{Subaddress}@{Domain}` in 
 
 #### Advanced configuration
 
-See the `worker.js` export constant `DEFAULTS` for documentation on advanced configuration which can be made by environment variables, including of the address and local part separators, the email address validation regular expression, custom forwarding header name and pass and fail values and the recoverable forwarding error regular expression.
+See the `worker.js` export constant `DEFAULTS` for documentation on advanced configuration which can be made by environment variables, including of the address and local part separators, the email address validation regular expression, custom forwarding header name, custom forwarding pass and fail values, and the recoverable forwarding error regular expression.
 
 > [!CAUTION]
 > The Email Worker has not been tested with any changes to the advanced configuration so proceed with caution and test that any advanced configuration works as expected before deploying it to a production environment.
+
+##### Forwarding error classification and handling
+
+If an error occurs when attempting to forward an email to a particular destination, the error will be classified as recoverable if it matches the the `CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP` regular expression, otherwise it will be classified as unrecoverable. The default regular expression is `.*` which means that by default all errors will be retreated as recoverable.
+
+If forwarding to any primary destination failed overall due to a recoverable error (that is forwarding to the primary destination itself or one of its backup destinations failed due to a recoverable error, and the primary and all backup destinations had some error) then overall the forwarding is considered to have had a recoverable failure. Otherwise it is considered to have had a unrecoverable failure.
+
+These two kinds of errors are then handled as follows:
+- Recoverable failure: An exception is thrown, which returns an error indication to the sender, which typically will then periodically resend the email until a retry or time limit have been exceeded.
+- Unrecoverable failure: The email is rejected according to the configured reject treatment (direct-rejecting or reject-forwarding as configured). If a message is direct-rejected by an Email Worker then Cloudflare returns an `555` SMTP error to the sending MTA, or `550` if it there is no Email Routing rule applicable to the message's destination. In both cases an `Undelivered Mail Returned to Sender` email will usually be sent do the sender.
+
+The default `CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP` regular expression considers all errors as recoverable to help avoid an email from being accidentally rejected with a `555` error code. Some bulk email SMTP services will place a temporary or permanent block delivery on an address if they receive an `555` error response when an attempt is made to send to it. This could take some time to automatically unblock, and in the worst case may require a support request to be submitted. To prevent such a block from occurring accidentally, by default all errors are considered recoverable.
+
+For reference, based on experience using the Cloudflare Email Forwarding Runtime API ([ForwardableEmailMessage.forward()](https://developers.cloudflare.com/email-routing/email-workers/runtime-api/#forwardableemailmessage-definition)), so far the following error message prefixes have been noted:
+- Configuration error message prefixes (detected in Cloudflare validation prior to an actual SMTP request):
+	- `destination address is invalid`: invalid destination email address.
+	- `destination address not verified`: the destination address was not verified in Email Routing.
+	- `message already forwarded to this destination`: duplicate destination email address.
+	- `cannot forward email to same worker`: forwarding to an address handled by the same Email Worker.
+- Transport error messages (prefix of the message only, and the result of an actual SMTP request)
+	- `could not send email: Unknown error: transient error ({N})`: a "transient", "temporary" or "soft" error `{N}` in the category of `4XX` SMTP errors, which will often be resolved after a period of time without intervention by an administrator.
+	- `could not send email: Unknown error: permanent error ({N})`: a "permanent", "persistent" or "hard" error `{N}` in the category of SMTP `5XX` errors, which will rarely be resolved without intervention by an administrator.
+
+> [!CAUTION]
+> Changing `CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP` to restrict which Cloudflare forwarding errors are considered recoverable may result in a destination address being blocked by the sender, sometimes temporarily, but in the worst case permanently.
 
 ### Enable
 

@@ -5,7 +5,7 @@ import escape from 'regexp.escape';
 import { message, r } from "./test/common.js";
 
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
-import worker, { FIXED, DEFAULTS } from "./worker.js";
+import worker, { FIXED, DEFAULTS } from "./src/worker.js";
 
 // Exceptional scnearios:
 // - forward mock throwing exceptions due to destinations having either
@@ -20,7 +20,8 @@ describe('exceptional scenarios', () => {
         USE_STORED_ADDRESS_CONFIGURATION: "true",
         USE_STORED_USER_CONFIGURATION: "true",
         REJECT_TREATMENT: 'default reject reason',
-        UNRECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE: 'Unrecoverable Forward Implementation Error',
+        CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP: `^(${escape(FIXED.CLOUDFLARE_FORWARDING_TRANSPORT_ERROR_MESSAGE_PREFIX)})`,
+        CLOUDFLARE_FORWARDING_UNRECOVERABLE_ERROR_MESSAGE_PREFIX: 'Cloudflare forwarding unrecoverable error',
     };
     const setReject = vi.spyOn(message, 'setReject');
 
@@ -35,11 +36,11 @@ describe('exceptional scenarios', () => {
     });
 
     // Mocked errors injected
-    const recoverableForwardImplementationErrorMessage = FIXED.RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1;
-    const unrecoverableForwardImplementationErrorMessage = TEST.UNRECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE;
+    const recoverableForwardImplementationErrorMessage = FIXED.CLOUDFLARE_FORWARDING_TRANSPORT_ERROR_MESSAGE_PREFIX;
+    const unrecoverableForwardImplementationErrorMessage = TEST.CLOUDFLARE_FORWARDING_UNRECOVERABLE_ERROR_MESSAGE_PREFIX;
 
     // Test subject errors caught
-    const recoverableForwardInterfaceErrorMessage = FIXED.RECOVERABLE_FORWARD_INTERFACE_ERROR_MESSAGE;
+    const recoverableForwardInterfaceErrorMessage = FIXED.RECOVERABLE_FORWARD_EXCEPTION_MESSAGE_PREFIX;
     const recoverableForwardInterfaceErrorRegExp = new RegExp(`^${escape(recoverableForwardInterfaceErrorMessage)}`);
 
     const failHeaders = new Headers({ [TEST.CUSTOM_HEADER]: TEST.CUSTOM_HEADER_FAIL });

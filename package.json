@@ -1,6 +1,6 @@
 {
     "name": "cloudflare-worker-email-forwarder",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "A Cloudflare Email Worker providing configurable email forwarding which routes from email addresses using sub-addressing (a.k.a. RFC 5233 sub-address extension, tagged addresses, plus addresses, etc.) to a set of primary destinations simultaneously, where each such primary destination is a sequence of backup destinations attempted sequentially until one succeeds.",
     "scripts": {
         "build": "bash ./build.sh",
@@ -8,7 +8,7 @@
         "deploy:keep-vars": "wrangler deploy --keep-vars",
         "dev": "echo `wrangler dev` not supported with email workers",
         "tail": "wrangler tail",
-        "test": "vitest watch",
+        "test": "vitest run --watch",
         "test:run": "vitest run",
         "test:debug": "vitest run --inspect-brk --pool forks --poolOptions.forks.singleFork # To run in a single child process, and will stop on breakpoints when debugged from vscode",
         "test:debug:no-file-parallelism": "vitest run --inspect-brk --no-file-parallelism # If pool is unknown",
@@ -18,9 +18,9 @@
         "versions:upload:keep-vars": "wrangler versions upload --keep-vars"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.8.38",
+        "@cloudflare/vitest-pool-workers": "^0.8.44",
         "vitest": "^3.1.4",
-        "wrangler": "^4.20.0"
+        "wrangler": "^4.21.0"
     },
     "dependencies": {
         "regexp.escape": "^2.0.1"

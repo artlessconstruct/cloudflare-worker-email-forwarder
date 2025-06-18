@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { message, r } from "./test/common.js";
 
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
-import worker, { DEFAULTS } from "./worker.js";
+import worker, { DEFAULTS } from "./src/worker.js";
 
 // Basic scenarios where:
 // - message.forward mock doesn't throw any exceptions

@@ -31,12 +31,15 @@ import escape from 'regexp.escape';
 
 export const FIXED = {
 
-    // Implementation errors caught
-    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1: 'could not send email:',
-    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_2: 'cannot forward email to same worker',
+    // Cloudflare ForwardableEmailMessage.forward() exception message prefixes:
+    CLOUDFLARE_FORWARDING_INVALID_ADDRESS_MESSAGE_PREFIX: 'destination address is invalid',
+    CLOUDFLARE_FORWARDING_UNVERIFIED_ADDRESS_MESSAGE_PREFIX: 'destination address not verified',
+    CLOUDFLARE_FORWARDING_DUPLICATE_ADDRESS_MESSAGE_PREFIX: `message already forwarded to this destination`,
+    CLOUDFLARE_FORWARDING_SAME_WORKER_ADDRESS_MESSAGE_PREFIX: `cannot forward email to same worker`,
+    CLOUDFLARE_FORWARDING_TRANSPORT_ERROR_MESSAGE_PREFIX: 'could not send email',
 
-    // Interface error messages thrown
-    RECOVERABLE_FORWARD_INTERFACE_ERROR_MESSAGE: 'Recoverable Forward Failure',
+    // Message prefixes for exception thrown:
+    RECOVERABLE_FORWARD_EXCEPTION_MESSAGE_PREFIX: 'forwarding error',
 
     // Matches if starts with a non-alphanumeric
     startsWithNonAlphanumericRegExp: /^[^A-Z0-9]/i,
@@ -46,7 +49,7 @@ export const FIXED = {
         for (const prependCondition of prependConditions) {
             const shouldPrepend =
                 typeof prependCondition.test === 'string'
-                && base.startsWith(prependCondition.test)
+                    && base.startsWith(prependCondition.test)
                 || prependCondition.test instanceof RegExp
                 && prependCondition.test.test(base);
             if (shouldPrepend)
@@ -68,7 +71,7 @@ class PrimaryDestinationResult {
 
 class RecoverableForwardError extends Error {
     constructor(errors) {
-        super(FIXED.RECOVERABLE_FORWARD_INTERFACE_ERROR_MESSAGE);
+        super(FIXED.RECOVERABLE_FORWARD_EXCEPTION_MESSAGE_PREFIX + ": (" + errors.map(e => `"${e.message}"`).join(', ') + ")");
         this.name = 'RecoverableForwardError';
         this.errors = errors;
     }
@@ -138,7 +141,7 @@ export const DEFAULTS = {
 
     // Error message configuration
     //
-    RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_REGEXP: `^(${escape(FIXED.RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_1)}|${escape(FIXED.RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_MESSAGE_2)})`,
+    CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP: ".*",
 
     // Cloudflare KV key-value store
     MAP: new Map(),
@@ -254,10 +257,10 @@ export const DEFAULTS = {
         );
     },
     // Forwards to a compoundDestination which is an array of zero or more primary
-    // destinations, by simultaneously fowarding to each primary destination.
+    // destinations, by simultaneously forwarding to each primary destination.
     // Throws if at least one primary destination had a recoverable error
     // and was not otherwise successful.
-    // Otherwise returns successful, which is true if fowarding succeeded to at
+    // Otherwise returns successful, which is true if forwarding succeeded to at
     // least one primary destination.
     async forwardToCompoundDestination(message, actionType, compoundDestination, customHeaders, emailImage, configuration) {
         const primaryDestinationResults = await Promise.all(
@@ -317,7 +320,7 @@ export default {
             SUBADDRESSES,
             USERS,
 
-            RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_REGEXP,
+            CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP,
 
             FORMAT_PRIMARY_ADDRESS_SEPARATOR,
             FORMAT_BACKUP_ADDRESS_SEPARATOR,
@@ -386,7 +389,7 @@ export default {
         ).trim().toLowerCase();
 
         const recoverableForwardImplementationErrorRegExp =
-            new RegExp(RECOVERABLE_FORWARD_IMPLEMENTATION_ERROR_REGEXP);
+            new RegExp(CLOUDFLARE_RECOVERABLE_FORWARDING_ERROR_REGEXP);
 
         const formatValidEmailAddressRegExp =
             new RegExp(FORMAT_VALID_EMAIL_ADDRESS_REGEXP);

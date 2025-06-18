@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "pnpm run test:run",
+            "type": "node",
+            "request": "launch",
+            "runtimeArgs": [
+                "run",
+                "test:run"
+            ],
+            "runtimeExecutable": "pnpm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "vitest run Debug Current Test File",
+            "type": "node",
+            "request": "launch",
+            "autoAttachChildProcesses": true,
+            "skipFiles": [
+                "<node_internals>/**",
+                "**/node_modules/**"
+            ],
+            "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+            "args": [
+                "run",
+                "${relativeFile}"
+            ],
+            "smartStep": true,
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Wrangler",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "cwd": "/",
+            "resolveSourceMapLocations": null,
+            "attachExistingChildren": false,
+            "autoAttachChildProcesses": false,
+            "sourceMaps": true // works with or without this line
+        }
+    ]
+}

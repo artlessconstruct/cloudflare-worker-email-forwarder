@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Specifing the file allows vitest to detect changes in the source files in watch mode:
-import worker, {DEFAULTS } from "./worker.js";
+import worker, {DEFAULTS } from "./src/worker.js";
 
 
 // Common test utilities and resources
