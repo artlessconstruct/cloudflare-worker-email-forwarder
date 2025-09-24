@@ -13,14 +13,14 @@
         "test:debug": "vitest run --inspect-brk --pool forks --poolOptions.forks.singleFork # To run in a single child process, and will stop on breakpoints when debugged from vscode",
         "test:debug:no-file-parallelism": "vitest run --inspect-brk --no-file-parallelism # If pool is unknown",
         "test:debug:single-thread": "vitest run --inspect-brk --pool threads --poolOptions.threads.singleThread # To run in a single worker",
-        "test:log": "vitest run --reporter=basic --disable-console-intercept",
+        "test:log": "vitest run --disable-console-intercept",
         "versions:upload": "wrangler versions upload",
         "versions:upload:keep-vars": "wrangler versions upload --keep-vars"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.8.44",
-        "vitest": "^3.1.4",
-        "wrangler": "^4.21.0"
+        "@cloudflare/vitest-pool-workers": "^0.9.4",
+        "vitest": "^3.2.4",
+        "wrangler": "^4.39.0"
     },
     "dependencies": {
         "regexp.escape": "^2.0.1"
