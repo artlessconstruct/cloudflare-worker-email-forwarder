@@ -18,9 +18,9 @@
         "versions:upload:keep-vars": "wrangler versions upload --keep-vars"
     },
     "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.9.4",
+        "@cloudflare/vitest-pool-workers": "^0.9.5",
         "vitest": "^3.2.4",
-        "wrangler": "^4.39.0"
+        "wrangler": "^4.40.0"
     },
     "dependencies": {
         "regexp.escape": "^2.0.1"

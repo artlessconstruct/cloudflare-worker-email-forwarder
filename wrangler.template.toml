@@ -1,6 +1,6 @@
 name = "${WRANGLER_NAME}"
 main = "src/worker.js"
-compatibility_date = "2025-06-17"
+compatibility_date = "2025-09-25"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 preview_urls = false
