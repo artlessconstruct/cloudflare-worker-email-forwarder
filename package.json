@@ -1,35 +1,42 @@
 {
-    "name": "cloudflare-worker-email-forwarder",
-    "version": "1.2.0",
-    "description": "A Cloudflare Email Worker providing configurable email forwarding which routes from email addresses using sub-addressing (a.k.a. RFC 5233 sub-address extension, tagged addresses, plus addresses, etc.) to a set of primary destinations simultaneously, where each such primary destination is a sequence of backup destinations attempted sequentially until one succeeds.",
-    "scripts": {
-        "build": "bash ./build.sh",
-        "deploy": "wrangler deploy",
-        "deploy:keep-vars": "wrangler deploy --keep-vars",
-        "dev": "echo `wrangler dev` not supported with email workers",
-        "tail": "wrangler tail",
-        "test": "vitest run --watch",
-        "test:run": "vitest run",
-        "test:debug": "vitest run --inspect-brk --pool forks --poolOptions.forks.singleFork # To run in a single child process, and will stop on breakpoints when debugged from vscode",
-        "test:debug:no-file-parallelism": "vitest run --inspect-brk --no-file-parallelism # If pool is unknown",
-        "test:debug:single-thread": "vitest run --inspect-brk --pool threads --poolOptions.threads.singleThread # To run in a single worker",
-        "test:log": "vitest run --disable-console-intercept",
-        "versions:upload": "wrangler versions upload",
-        "versions:upload:keep-vars": "wrangler versions upload --keep-vars"
-    },
-    "devDependencies": {
-        "@cloudflare/vitest-pool-workers": "^0.9.5",
-        "vitest": "^3.2.4",
-        "wrangler": "^4.40.0"
-    },
-    "dependencies": {
-        "regexp.escape": "^2.0.1"
-    },
-    "engines": {
-        "node": "22.16.0",
-        "pnpm": "10.11.1"
-    },
-    "volta": {
-        "node": "22.16.0"
-    }
+	"name": "cloudflare-worker-email-forwarder",
+	"version": "1.3.0",
+	"description": "A Cloudflare Email Worker providing configurable email forwarding which routes from email addresses using sub-addressing (a.k.a. RFC 5233 sub-address extension, tagged addresses, plus addresses, etc.) to a set of primary destinations simultaneously, where each such primary destination is a sequence of backup destinations attempted sequentially until one succeeds.",
+	"scripts": {
+		"build": "bash ./build.sh",
+		"deploy": "wrangler deploy",
+		"deploy:keep-vars": "wrangler deploy --keep-vars",
+		"dev": "echo `wrangler dev` not supported with email workers",
+		"tail": "wrangler tail",
+		"test": "vitest run",
+		"test:watch": "vitest run --watch",
+		"test:debug": "vitest run --inspect-brk --pool forks --poolOptions.forks.singleFork # To run in a single child process, and will stop on breakpoints when debugged from vscode",
+		"test:debug:no-file-parallelism": "vitest run --inspect-brk --no-file-parallelism # If pool is unknown",
+		"test:debug:single-thread": "vitest run --inspect-brk --pool threads --poolOptions.threads.singleThread # To run in a single worker",
+		"test:log": "vitest run --disable-console-intercept",
+		"versions:upload": "wrangler versions upload",
+		"versions:upload:keep-vars": "wrangler versions upload --keep-vars"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.12.21",
+		"vitest": "^3.2.4",
+		"wrangler": "^4.73.0"
+	},
+	"dependencies": {
+		"regexp.escape": "^2.0.1"
+	},
+	"engines": {
+		"node": "22.16.0",
+		"pnpm": "10.11.1"
+	},
+	"volta": {
+		"node": "22.16.0",
+		"pnpm": "10.11.1"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"sharp",
+			"workerd"
+		]
+	}
 }
